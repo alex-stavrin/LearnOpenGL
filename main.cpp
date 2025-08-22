@@ -8,11 +8,17 @@
 // triangle vertices in NDC (Normalized Device Coordinates x,y,z in [-1,1])
 // lets draw a play button shape
 // (0,0,0) is center of screen
+	
 float vertices[] = {
-    -0.25,0.5,0.0,
-    -0.25,-0.5, 0.0,
-    0.25,0.0, 0.0
+     0.5f,  0.5f, 0.0f,  // top right
+     0.5f, -0.5f, 0.0f,  // bottom right
+    -0.5f, -0.5f, 0.0f,  // bottom left
+    -0.5f,  0.5f, 0.0f   // top left 
 };
+unsigned int indices[] = {  // note that we start from 0!
+    0, 1, 3,   // first triangle
+    1, 2, 3    // second triangle
+};  
 
 const char *vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
@@ -71,19 +77,28 @@ int main()
     glViewport(0,0, windowWidth, windowHeight);
 
     glfwSetFramebufferSizeCallback(window, onFramebufferSizeChanged);
+    
+    // Vertex Buffer
+    unsigned vertexBufferObject;
+    glGenBuffers(1, &vertexBufferObject);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    // Vertex array
     unsigned vertexArrayObject;
     glGenVertexArrays(1, &vertexArrayObject);
     glBindVertexArray(vertexArrayObject);
 
-    unsigned vertexBufferObject;
-    glGenBuffers(1, &vertexBufferObject);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
+    // Vertex array attributes
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    // Vertex array element buffer
+    // The vertex knows this its element buffer because it is bound
+    unsigned int elementsBufferObject;
+    glGenBuffers(1, &elementsBufferObject);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsBufferObject);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // create vertex shader
     unsigned vertexShader;
@@ -147,10 +162,10 @@ int main()
 
         // clear the last frame
         glClear(GL_COLOR_BUFFER_BIT);
-
         glUseProgram(shaderProgram);
         glBindVertexArray(vertexArrayObject);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 
         // GO TO NEXT FRAME //
