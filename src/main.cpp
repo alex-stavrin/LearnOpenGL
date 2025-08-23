@@ -1,6 +1,7 @@
 #include <iostream>
-#include "glad/glad.h"
+#include "../include/glad/glad.h"
 #include "GLFW/glfw3.h"
+#include "../include/Shader.h"
 
 #define windowWidth 800
 #define windowHeight 600
@@ -10,28 +11,33 @@
 // (0,0,0) is center of screen
 	
 float vertices[] = {
-     0.5f,  0.5f, 0.0f,  // top right
-     0.5f, -0.5f, 0.0f,  // bottom right
-    -0.5f, -0.5f, 0.0f,  // bottom left
-    -0.5f,  0.5f, 0.0f   // top left 
+    // location         // color
+    0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f, // top right
+    0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom left
+    -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f  // top left 
 };
-unsigned int indices[] = {  // note that we start from 0!
+unsigned int indices[] = {
     0, 1, 3,   // first triangle
     1, 2, 3    // second triangle
 };  
 
 const char *vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
+    "layout (location = 1) in vec3 aColor\n;"
+    "out vec4 outColor;\n"
     "void main()\n"
     "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "   outColor = vec4(aColor, 1.0);"
+    "   gl_Position = vec4(aPos, 1.0);\n"
     "}\0";
 
 const char *fragmentShaderSource = "#version 330 core\n"
     "out vec4 FragColor;\n"
+    "in vec4 outColor;\n"
     "void main()\n"
     "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "   FragColor = outColor;\n"
     "}\n\0";
 
 void onFramebufferSizeChanged(GLFWwindow* window, int width, int height)
@@ -90,8 +96,10 @@ int main()
     glBindVertexArray(vertexArrayObject);
 
     // Vertex array attributes
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // Vertex array element buffer
     // The vertex knows this its element buffer because it is bound
