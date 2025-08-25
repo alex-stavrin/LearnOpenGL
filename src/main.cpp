@@ -22,24 +22,6 @@ unsigned int indices[] = {
     1, 2, 3    // second triangle
 };  
 
-const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "layout (location = 1) in vec3 aColor\n;"
-    "out vec4 outColor;\n"
-    "void main()\n"
-    "{\n"
-    "   outColor = vec4(aColor, 1.0);"
-    "   gl_Position = vec4(aPos, 1.0);\n"
-    "}\0";
-
-const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "in vec4 outColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = outColor;\n"
-    "}\n\0";
-
 void onFramebufferSizeChanged(GLFWwindow* window, int width, int height)
 {
     glViewport(0,0,width,height);
@@ -108,57 +90,8 @@ int main()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsBufferObject);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    // create vertex shader
-    unsigned vertexShader;
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
 
-    // check compilation result of vertex shader
-    int success;
-    char infoLog[512];
-
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if(!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << infoLog << std::endl;
-    }
-
-    // create fragment shader
-    unsigned fragmentShader;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-
-    // check compilation result of fragment shader
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if(!success)
-    {
-
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << infoLog << std::endl;
-    }
-
-    // combine the vertex and fragment shaders into a shader program
-    unsigned shaderProgram;
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    // check for errors in the linking of the shader program
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if(!success)
-    {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << infoLog << std::endl;
-    }
-
-    // after linking. delete the shaders. they are in the linked program now
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    Shader basicShader = Shader("./shaders/basic/basic.vert", "./shaders/basic/basic.frag");
 
     // Game loop
     while (!glfwWindowShouldClose(window))
@@ -170,7 +103,7 @@ int main()
 
         // clear the last frame
         glClear(GL_COLOR_BUFFER_BIT);
-        glUseProgram(shaderProgram);
+        basicShader.use();
         glBindVertexArray(vertexArrayObject);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
