@@ -2,6 +2,7 @@
 #include "../include/glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "../include/Shader.h"
+#include "stb_image.h"
 
 #define windowWidth 800
 #define windowHeight 600
@@ -17,6 +18,14 @@ float vertices[] = {
     -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom left
     -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f  // top left 
 };
+
+float textureCoordinates[] = {
+    1.0, 1.0, // top right
+    1.0, 0.0, // bottom right
+    0.0, 0.0, // bottom left
+    0.0, 1.0 // top left
+};
+
 unsigned int indices[] = {
     0, 1, 3,   // first triangle
     1, 2, 3    // second triangle
@@ -65,6 +74,10 @@ int main()
     glViewport(0,0, windowWidth, windowHeight);
 
     glfwSetFramebufferSizeCallback(window, onFramebufferSizeChanged);
+
+    // load texture
+    int textureWidth, textureHeight, numberOfColorChannels;
+    unsigned char* imageBytes = stbi_load("")
     
     // Vertex Buffer
     unsigned vertexBufferObject;
