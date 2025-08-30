@@ -60,7 +60,7 @@ Shader::Shader(const char* vertexShaderPath, const char* fragmentShaderPath)
     glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
     if(!success)
     {
-        glGetShaderInfoLog(vertex, 512, NULL, infoLog);
+        glGetShaderInfoLog(fragment, 512, NULL, infoLog);
         std::cout << "Error fragment shader compilation: " << infoLog << std::endl;
     }
 
@@ -85,4 +85,25 @@ Shader::Shader(const char* vertexShaderPath, const char* fragmentShaderPath)
 void Shader::use()
 {
     glUseProgram(id);
+}
+
+void Shader::setInt(const std::string& uniformName, int value)
+{
+    use();
+    int uniformLocation = glGetUniformLocation(id, uniformName.c_str());
+    glUniform1i(uniformLocation, value);
+}
+
+void Shader::setFloat(const std::string& uniformName, float value)
+{
+    use();
+    int uniformLocation = glGetUniformLocation(id, uniformName.c_str());
+    glUniform1f(uniformLocation, value);
+}
+
+void Shader::setMatrix4(const std::string& uniformName, const glm::mat4& value)
+{
+    use();
+    int uniformLocation = glGetUniformLocation(id, uniformName.c_str());
+    glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
 }
