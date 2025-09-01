@@ -227,8 +227,14 @@ int main()
 
 
     glm::mat4 view = glm::mat4(1.0f);
+
     glm::vec3 cameraPos = glm::vec3(0.0f,1.0f,3.0f);
-    view = glm::translate(view, -cameraPos);
+
+    glm::vec3 cameraUp = glm::vec3(0.0f,1.0f,0.0f);
+    glm::vec3 cameraForward = glm::vec3(0.0f,0.0f,-1.0f);
+    glm::vec3 cameraRight = glm::normalize(glm::cross(cameraUp, cameraForward));
+
+    view = glm::lookAt(cameraPos, cameraPos + cameraForward, cameraUp);
 
     glm::mat4 projection = glm::perspective(glm::radians(90.0f), (float)windowWidth / (float)windowHeight, 0.1f, 100.0f);
 
